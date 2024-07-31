@@ -1,6 +1,10 @@
+from typing import List
+
 import numpy as np
 import pandas as pd
 from scipy.signal import butter, filtfilt, find_peaks
+
+from models import SensorData
 
 fs = 100
 nyquist = 0.5 * fs
@@ -32,16 +36,19 @@ def calc_mean_frequency(data):
 
 
 # ir red e timestamp array
-def handle_data(data):
+def handle_data(data: List[SensorData]):
+    arr_red = [int(obj["red"]) for obj in data]
+    arr_ir = [int(obj["ir"]) for obj in data]
+
     a = 1.6
     b = -35
     c = 113
 
-    dc_ir = lowpass_filter(data.ir)
-    dc_red = lowpass_filter(data.red)
+    dc_ir = lowpass_filter(arr_ir)
+    dc_red = lowpass_filter(arr_red)
 
-    ac_ir = bandpass_filter(data.ir)
-    ac_red = bandpass_filter(data.red)
+    ac_ir = bandpass_filter(arr_ir)
+    ac_red = bandpass_filter(arr_red)
 
     std_ac_ir = np.std(ac_ir)
     std_ac_red = np.std(ac_red)
