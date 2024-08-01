@@ -44,7 +44,6 @@ def calc_mean_frequency(data):
 def handle_data(data: List[SensorData]):
     arr_red = [item.red for item in data]
     arr_ir = [item.ir for item in data]
-    arr_timestamp = [item.timestamp for item in data]
 
     a = 1.6
     b = -35
@@ -72,6 +71,10 @@ def handle_data(data: List[SensorData]):
     spo2 = part1 + part2 + c
 
     peaks, _ = find_peaks(ac_ir, distance=nyquist, prominence=0.4)
+    print(peaks)
+
+    if len(peaks) != 2:
+        return spo2, 0
 
     peak_intervals = np.diff(peaks) / fs  # Intervalos entre picos em segundos
     bpm = 60 / peak_intervals.mean()  # Batimentosbpm = 60 / peak_intervals.mean()
