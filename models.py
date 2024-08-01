@@ -2,6 +2,6 @@ from pydantic import BaseModel
 
 
 class SensorData(BaseModel):
-    ir: str
-    red: str
+    ir: int
+    red: int
     timestamp: str

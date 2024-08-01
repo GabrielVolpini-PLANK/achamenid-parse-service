@@ -28,17 +28,23 @@ def bandpass_filter(data):
 
 def calc_mean_frequency(data):
     timestamps = pd.to_datetime(data, format="%Y-%m-%d %H:%M:%S:%f")
+    timestamps = timestamps.drop_duplicates()
 
     time_diffs = np.diff(timestamps) / np.timedelta64(1, "s")
-    frequencies = 1 / time_diffs
-    mean_frequency = np.mean(frequencies)
-    return mean_frequency
+
+    mean_frequency = np.mean(time_diffs)
+
+    frequencies = 1 / mean_frequency
+
+    print(frequencies)
+    return frequencies * 10
 
 
 # ir red e timestamp array
 def handle_data(data: List[SensorData]):
-    arr_red = [int(obj["red"]) for obj in data]
-    arr_ir = [int(obj["ir"]) for obj in data]
+    arr_red = [item.red for item in data]
+    arr_ir = [item.ir for item in data]
+    arr_timestamp = [item.timestamp for item in data]
 
     a = 1.6
     b = -35
@@ -65,13 +71,9 @@ def handle_data(data: List[SensorData]):
 
     spo2 = part1 + part2 + c
 
-    peaks, _ = find_peaks(ac_red, distance=70)
-    first_peak = peaks[0]
-    second_peak = peaks[1]
-    peak_difference = second_peak - first_peak
-    # calcular frequencia media das amostras
-    peak_rate = 98.44 / peak_difference
+    peaks, _ = find_peaks(ac_ir, distance=nyquist, prominence=0.4)
 
-    bpm = peak_rate * 60
+    peak_intervals = np.diff(peaks) / fs  # Intervalos entre picos em segundos
+    bpm = 60 / peak_intervals.mean()  # Batimentosbpm = 60 / peak_intervals.mean()
 
     return spo2, bpm
