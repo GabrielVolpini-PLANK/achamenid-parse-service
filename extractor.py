@@ -74,7 +74,7 @@ def handle_data(data: List[SensorData]):
     print(peaks)
 
     if len(peaks) <= 2:
-        return spo2, 0
+        return spo2, 0, pi_ir
 
     peak_intervals = np.diff(peaks) / fs  # Intervalos entre picos em segundos
     bpm = 60 / peak_intervals.mean()  # Batimentosbpm = 60 / peak_intervals.mean()
