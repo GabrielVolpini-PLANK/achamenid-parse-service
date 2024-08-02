@@ -19,7 +19,7 @@ def read_root():
 @app.post("/parse")
 async def parse(data: List[SensorData]):
     try:
-        spo2, bpm = handle_data(data)
-        return {"spo2": spo2, "bpm": bpm}
+        spo2, bpm, pi = handle_data(data)
+        return {"spo2": spo2, "bpm": bpm, "pi": pi}
     except Exception as e:
         return {"data": data, "error": str(e)}
