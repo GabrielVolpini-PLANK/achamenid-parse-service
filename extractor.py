@@ -73,7 +73,7 @@ def handle_data(data: List[SensorData]):
     peaks, _ = find_peaks(ac_ir, distance=nyquist, prominence=0.4)
     print(peaks)
 
-    if len(peaks) != 2:
+    if len(peaks) <= 2:
         return spo2, 0
 
     peak_intervals = np.diff(peaks) / fs  # Intervalos entre picos em segundos
