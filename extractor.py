@@ -45,6 +45,12 @@ def handle_data(data: List[SensorData]):
     arr_red = [item.red for item in data]
     arr_ir = [item.ir for item in data]
 
+    if not any(arr_red):
+        return 0, 0, 0
+    
+    if not any(arr_ir):
+        return 0, 0, 0
+
     a = 1.6
     b = -35
     c = 113
