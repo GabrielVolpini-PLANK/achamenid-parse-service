@@ -5,6 +5,7 @@ import pandas as pd
 from scipy.signal import butter, filtfilt, find_peaks
 
 from models import SensorData
+from validator import Validator
 
 fs = 100
 nyquist = 0.5 * fs
@@ -26,30 +27,24 @@ def bandpass_filter(data):
     return filtfilt(band_b, band_a, data)
 
 
-def calc_mean_frequency(data):
-    timestamps = pd.to_datetime(data, format="%Y-%m-%d %H:%M:%S:%f")
-    timestamps = timestamps.drop_duplicates()
-
-    time_diffs = np.diff(timestamps) / np.timedelta64(1, "s")
-
-    mean_frequency = np.mean(time_diffs)
-
-    frequencies = 1 / mean_frequency
-
-    print(frequencies)
-    return frequencies * 10
-
-
-# ir red e timestamp array
 def handle_data(data: List[SensorData]):
+    validate = Validator()
+
     arr_red = [item.red for item in data]
     arr_ir = [item.ir for item in data]
+
+    validate.red(arr_red)
+
+    validate.ir(arr_ir)
+
+    isPhysiological = {"prop": "peak", "value": "0.8"}
 
     a = 1.6
     b = -35
     c = 113
 
     dc_ir = lowpass_filter(arr_ir)
+
     dc_red = lowpass_filter(arr_red)
 
     ac_ir = bandpass_filter(arr_ir)
@@ -61,6 +56,9 @@ def handle_data(data: List[SensorData]):
     avg_dc_ir = np.mean(dc_ir)
     avg_dc_red = np.mean(dc_red)
 
+    validate.avg_dc(avg_dc_ir)
+    validate.avg_dc(avg_dc_red)
+
     pi_ir = std_ac_ir / avg_dc_ir
     pi_red = std_ac_red / avg_dc_red
 
@@ -71,12 +69,13 @@ def handle_data(data: List[SensorData]):
     spo2 = part1 + part2 + c
 
     peaks, _ = find_peaks(ac_ir, distance=nyquist, prominence=0.4)
-    print(peaks)
 
-    if len(peaks) <= 2:
-        return spo2, 0, pi_ir * 100
+    validate.peaks(peaks)
 
     peak_intervals = np.diff(peaks) / fs  # Intervalos entre picos em segundos
     bpm = 60 / peak_intervals.mean()  # Batimentosbpm = 60 / peak_intervals.mean()
 
-    return spo2, bpm, pi_ir * 100
+    validate.spo2(spo2)
+    validate.bpm(bpm)
+
+    return spo2, bpm, pi_ir * 100, isPhysiological
