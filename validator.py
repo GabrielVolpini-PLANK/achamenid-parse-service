@@ -5,22 +5,27 @@ class Validator:
     def __init__(self):
         pass
 
-    def red(self, arr_red):
-        MAX_RED_MEAN = 400000
+    def red_ir(self, arr_red, arr_ir):
+        MAX_RED_MEAN = 600000
         MIN_RED_MEAN = 50000
-        arr_red_mean = np.mean(arr_red)
 
-        if arr_red_mean > MAX_RED_MEAN or arr_red_mean < MIN_RED_MEAN:
-            raise ValueError("Red data out of range")
-        return
-
-    def ir(self, arr_ir):
         MAX_IR_MEAN = 500000
         MIN_IR_MEAN = 15000
-        arr_ir_mean = np.mean(arr_ir)
 
-        if arr_ir_mean > MAX_IR_MEAN or arr_ir_mean < MIN_IR_MEAN:
+        arr_ir_mean = np.mean(arr_ir)
+        arr_red_mean = np.mean(arr_red)
+
+        red_invalid = arr_red_mean > MAX_RED_MEAN or arr_red_mean < MIN_RED_MEAN
+
+        ir_invalid = arr_ir_mean > MAX_IR_MEAN or arr_ir_mean < MIN_IR_MEAN
+
+        if red_invalid and ir_invalid:
+            raise ValueError("RED and IR data out of range")
+        elif red_invalid:
+            raise ValueError("RED data out of range")
+        elif ir_invalid:
             raise ValueError("IR data out of range")
+
         return
 
     def avg_dc(self, dc):
