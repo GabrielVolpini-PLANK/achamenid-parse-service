@@ -32,7 +32,7 @@ def handle_data(data: List[SensorData]):
 
     arr_red = [item.red for item in data]
     arr_ir = [item.ir for item in data]
-
+    
     validate.red_ir(arr_red, arr_ir)
 
     isPhysiological = {"prop": "peak", "value": "0.8"}
