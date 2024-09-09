@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 
 from extractor import handle_data
 from models import SensorData
@@ -18,8 +19,9 @@ def read_root():
 
 @app.post("/parse")
 async def parse(data: List[SensorData]):
+
     try:
-        spo2, bpm, pi = handle_data(data)
-        return {"spo2": spo2, "bpm": bpm, "pi": pi}
+        spo2, bpm, pi, isPhysiological = handle_data(data)
+        return {"spo2": spo2, "bpm": bpm, "pi": pi, "isPhysiological": isPhysiological}
     except Exception as e:
-        return {"data": data, "error": str(e)}
+        return JSONResponse(status_code=422, content={"message": str(e)})
